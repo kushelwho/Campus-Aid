@@ -299,7 +299,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   ? Border.all(color: Theme.of(context).colorScheme.primary)
                   : null,
         ),
-        child: Text(emoji, style: const TextStyle(fontSize: 32)),
+        child: Text(
+          emoji,
+          style: const TextStyle(fontSize: 30),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

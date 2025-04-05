@@ -569,34 +569,49 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Eligibility: ${scholarship['eligibility']}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  Expanded(
+                    flex: 7,
+                    child: Text(
+                      'Eligibility: ${scholarship['eligibility']}',
+                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
+                  SizedBox(width: 4),
                   if (isApplied)
                     _buildStatusChip(scholarship['status'] as String)
                   else
-                    FilledButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) => ScholarshipDetailScreen(
-                                  scholarshipId: scholarship['id'] as String,
-                                  isApplied: false,
-                                ),
+                    Expanded(
+                      flex: 3,
+                      child: FilledButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ScholarshipDetailScreen(
+                                    scholarshipId: scholarship['id'] as String,
+                                    isApplied: false,
+                                  ),
+                            ),
+                          );
+                        },
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 6,
                           ),
-                        );
-                      },
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          minimumSize: const Size(0, 28),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text(
+                          'Apply Now',
+                          style: TextStyle(fontSize: 10),
                         ),
                       ),
-                      child: const Text('Apply Now'),
                     ),
                 ],
               ),
