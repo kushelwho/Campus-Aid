@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'item_submit_screen.dart';
-import 'map_view_screen.dart';
 
 class LostFoundHome extends StatefulWidget {
   const LostFoundHome({super.key});
@@ -114,18 +113,6 @@ class _LostFoundHomeState extends State<LostFoundHome>
           controller: _tabController,
           tabs: const [Tab(text: 'Lost Items'), Tab(text: 'Found Items')],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.map),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MapViewScreen()),
-              );
-            },
-            tooltip: 'Map View',
-          ),
-        ],
       ),
       body: Column(
         children: [

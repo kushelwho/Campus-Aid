@@ -68,9 +68,7 @@ User views personalized dashboard with:
 - User browses lost/found items list
 - Applies filters (date, category, location)
 - Views items on interactive campus map
-- When match is found, initiates chat with finder/owner
 - Answers verification question to claim item
-- Arranges handover through in-app chat
 
 ### 3. Automated Scholarship Finder
 
