@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../features/scholarship/providers/scholarship_provider.dart';
+import '../../../features/scholarship/screens/scholarship_detail_screen.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -35,6 +38,34 @@ class _HomeDashboardState extends State<HomeDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the scholarship provider to access scholarships with near deadlines
+    final scholarshipProvider = Provider.of<ScholarshipProvider>(
+      context,
+      listen: false,
+    );
+    final scholarshipWithNearDeadline =
+        scholarshipProvider.getScholarshipWithNearestDeadline();
+
+    String scholarshipDescription = 'No scholarships with upcoming deadlines';
+    if (scholarshipWithNearDeadline != null) {
+      // Calculate days remaining
+      final deadline = DateTime.parse(scholarshipWithNearDeadline.deadline);
+      final now = DateTime.now();
+      final daysRemaining = deadline.difference(now).inDays;
+
+      String timeframe;
+      if (daysRemaining == 0) {
+        timeframe = 'today';
+      } else if (daysRemaining == 1) {
+        timeframe = 'tomorrow';
+      } else {
+        timeframe = 'in $daysRemaining days';
+      }
+
+      scholarshipDescription =
+          '${scholarshipWithNearDeadline.title} application closes $timeframe';
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Campus Aid'),
@@ -42,7 +73,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              // Show notifications
+              _showNotifications();
             },
           ),
           IconButton(
@@ -146,20 +177,148 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 description: 'Paneer Butter Masala with Rice and Naan',
                 icon: Icons.restaurant,
                 color: Colors.orange,
+                onTap: () {
+                  // Direct navigation to canteen with immediate booking dialog
+                  _directlyOpenCanteenBooking(context);
+                },
               ),
               const SizedBox(height: 16),
               _buildRecommendationCard(
                 context,
                 title: 'Scholarship Deadline',
-                description: 'Merit scholarship application closes tomorrow',
+                description: scholarshipDescription,
                 icon: Icons.school,
                 color: Colors.green,
+                onTap: () {
+                  if (scholarshipWithNearDeadline != null) {
+                    // Navigate directly to scholarship detail
+                    _directlyOpenScholarshipDetail(
+                      context,
+                      scholarshipWithNearDeadline.id,
+                    );
+                  } else {
+                    // If no scholarships with near deadlines, just navigate to scholarship home
+                    Navigator.pushNamed(context, '/scholarship');
+                  }
+                },
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _directlyOpenCanteenBooking(BuildContext context) {
+    // Navigate to canteen page
+    Navigator.pushNamed(context, '/canteen');
+
+    // Delay slightly to ensure the canteen screen is loaded
+    Future.delayed(const Duration(milliseconds: 100), () {
+      // After navigation, trigger the book meal dialog
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Book a Meal'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Choose meal type:'),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: 'Lunch',
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Breakfast',
+                        child: Text('Breakfast'),
+                      ),
+                      DropdownMenuItem(value: 'Lunch', child: Text('Lunch')),
+                      DropdownMenuItem(value: 'Dinner', child: Text('Dinner')),
+                    ],
+                    onChanged: (value) {},
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Date and Time:'),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () {
+                      // Show date picker
+                    },
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.calendar_today),
+                      ),
+                      child: const Text('Today, Apr 5, 2023'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Any special instructions?'),
+                  const SizedBox(height: 8),
+                  const TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'e.g., No spicy food, allergies, etc.',
+                    ),
+                    maxLines: 2,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Show confirmation
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Meal booking request submitted!'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+                child: const Text('Book'),
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
+
+  void _directlyOpenScholarshipDetail(
+    BuildContext context,
+    String scholarshipId,
+  ) {
+    // First navigate to the scholarship screen
+    Navigator.pushNamed(context, '/scholarship');
+
+    // Delay slightly to ensure the scholarship screen is loaded
+    Future.delayed(const Duration(milliseconds: 100), () {
+      // Then navigate to the specific scholarship detail
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => ScholarshipDetailScreen(
+                scholarshipId: scholarshipId,
+                isApplied: false, // The screen will check the actual status
+              ),
+        ),
+      );
+    });
   }
 
   Widget _buildFeatureTile(
@@ -211,45 +370,50 @@ class _HomeDashboardState extends State<HomeDashboard> {
     required String description,
     required IconData icon,
     required Color color,
+    required VoidCallback onTap,
   }) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 32),
               ),
-              child: Icon(icon, color: color, size: 32),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Icon(Icons.arrow_forward_ios, size: 18),
-          ],
+              const Icon(Icons.arrow_forward_ios, size: 18),
+            ],
+          ),
         ),
       ),
     );

@@ -26,6 +26,34 @@ class ScholarshipProvider with ChangeNotifier {
     }
   }
 
+  // Get scholarships with deadlines that are near (within 7 days)
+  List<ScholarshipModel> getScholarshipsWithNearDeadlines() {
+    final now = DateTime.now();
+    return _scholarships.where((scholarship) {
+      final deadline = DateTime.parse(scholarship.deadline);
+      final daysRemaining = deadline.difference(now).inDays;
+      return daysRemaining >= 0 && daysRemaining <= 7;
+    }).toList();
+  }
+
+  // Get the scholarship with the nearest deadline
+  ScholarshipModel? getScholarshipWithNearestDeadline() {
+    final nearDeadlines = getScholarshipsWithNearDeadlines();
+    if (nearDeadlines.isEmpty) {
+      return null;
+    }
+
+    // Sort by deadline (ascending)
+    nearDeadlines.sort((a, b) {
+      final deadlineA = DateTime.parse(a.deadline);
+      final deadlineB = DateTime.parse(b.deadline);
+      return deadlineA.compareTo(deadlineB);
+    });
+
+    // Return the scholarship with the closest deadline
+    return nearDeadlines.first;
+  }
+
   // Load scholarships from SharedPreferences
   Future<void> _loadScholarships() async {
     try {
