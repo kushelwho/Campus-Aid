@@ -11,6 +11,7 @@ import 'features/profile/screens/user_profile_screen.dart';
 import 'features/canteen/providers/canteen_provider.dart';
 import 'features/canteen/services/gemini_service.dart';
 import 'features/lost_found/providers/lost_found_provider.dart';
+import 'features/scholarship/providers/scholarship_provider.dart';
 
 class CampusAidApp extends StatelessWidget {
   const CampusAidApp({super.key});
@@ -19,6 +20,8 @@ class CampusAidApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // Create a single instance of the LostFoundProvider to ensure we're using the same one everywhere
     final lostFoundProvider = LostFoundProvider();
+    // Create an instance of ScholarshipProvider
+    final scholarshipProvider = ScholarshipProvider();
 
     print('App initialized - creating providers');
 
@@ -27,6 +30,8 @@ class CampusAidApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CanteenProvider(GeminiService())),
         // Use the instance we created to ensure consistency
         ChangeNotifierProvider.value(value: lostFoundProvider),
+        // Add ScholarshipProvider
+        ChangeNotifierProvider.value(value: scholarshipProvider),
       ],
       child: Builder(
         builder: (context) {

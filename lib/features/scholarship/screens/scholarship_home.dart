@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/scholarship_provider.dart';
+import '../../../core/models/scholarship_model.dart';
 import 'profile_screen.dart';
 import 'scholarship_detail_screen.dart';
 
@@ -13,6 +16,8 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _selectedCategory = 'All';
+  int _visibleItemCount = 5; // Initially show only 5 items
+  bool _showLoadMore = true;
 
   // Filter options
   final List<String> _categories = [
@@ -25,72 +30,6 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
     'International',
   ];
 
-  // Mock scholarship data
-  final List<Map<String, dynamic>> _scholarships = [
-    {
-      'id': '1',
-      'title': 'National Merit Scholarship',
-      'category': 'Merit',
-      'description':
-          'Scholarship for students with outstanding academic achievements.',
-      'amount': '₹50,000',
-      'deadline': '2023-05-30',
-      'eligibility': 'CGPA 8.5 or above, any discipline',
-      'matchPercentage': 92,
-      'isApplied': false,
-      'status': 'Not Applied',
-    },
-    {
-      'id': '2',
-      'title': 'Financial Aid Scholarship',
-      'category': 'Need-based',
-      'description': 'Support for students from economically weaker sections.',
-      'amount': '₹30,000',
-      'deadline': '2023-06-15',
-      'eligibility': 'Annual family income below ₹3,00,000',
-      'matchPercentage': 78,
-      'isApplied': true,
-      'status': 'Under Review',
-    },
-    {
-      'id': '3',
-      'title': 'Engineering Excellence Scholarship',
-      'category': 'Merit',
-      'description': 'For top-performing engineering students.',
-      'amount': '₹40,000',
-      'deadline': '2023-05-20',
-      'eligibility': 'Engineering students with CGPA 9.0 or above',
-      'matchPercentage': 85,
-      'isApplied': false,
-      'status': 'Not Applied',
-    },
-    {
-      'id': '4',
-      'title': 'Sports Achievement Grant',
-      'category': 'Sports',
-      'description':
-          'For students representing college in national sports events.',
-      'amount': '₹25,000',
-      'deadline': '2023-07-10',
-      'eligibility': 'State or national level sports certificate',
-      'matchPercentage': 65,
-      'isApplied': true,
-      'status': 'Approved',
-    },
-    {
-      'id': '5',
-      'title': 'Research Fellowship',
-      'category': 'Research',
-      'description': 'Support for students pursuing research projects.',
-      'amount': '₹60,000',
-      'deadline': '2023-06-30',
-      'eligibility': 'Research proposal, faculty recommendation',
-      'matchPercentage': 70,
-      'isApplied': false,
-      'status': 'Not Applied',
-    },
-  ];
-
   // Check if user profile is complete
   bool _isProfileComplete = false;
 
@@ -98,27 +37,21 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    // Reset visible count when tab changes
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {
+          _visibleItemCount = 5;
+          _showLoadMore = true;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  // Get filtered scholarships based on selected category
-  List<Map<String, dynamic>> get _filteredScholarships {
-    return _scholarships
-        .where(
-          (s) =>
-              _selectedCategory == 'All' || s['category'] == _selectedCategory,
-        )
-        .toList();
-  }
-
-  // Get scholarships based on application status
-  List<Map<String, dynamic>> get _myApplications {
-    return _scholarships.where((s) => s['isApplied'] == true).toList();
   }
 
   @override
@@ -148,20 +81,37 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
           ),
         ],
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          // Discover Tab
-          _buildDiscoverTab(),
+      body: Consumer<ScholarshipProvider>(
+        builder: (context, scholarshipProvider, child) {
+          if (scholarshipProvider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-          // My Applications Tab
-          _buildApplicationsTab(),
-        ],
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              // Discover Tab
+              _buildDiscoverTab(scholarshipProvider),
+
+              // My Applications Tab
+              _buildApplicationsTab(scholarshipProvider),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildDiscoverTab() {
+  Widget _buildDiscoverTab(ScholarshipProvider provider) {
+    final filteredScholarships = provider.getFilteredScholarships(
+      _selectedCategory,
+    );
+    // Limit the number of visible items
+    final visibleScholarships =
+        filteredScholarships.take(_visibleItemCount).toList();
+    // Determine if we need to show the "Load More" button
+    _showLoadMore = filteredScholarships.length > _visibleItemCount;
+
     return Column(
       children: [
         if (!_isProfileComplete)
@@ -246,6 +196,8 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                             onSelected: (selected) {
                               setState(() {
                                 _selectedCategory = category;
+                                // Reset visible count when changing category
+                                _visibleItemCount = 5;
                               });
                             },
                             backgroundColor: Colors.grey[200],
@@ -266,7 +218,7 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
         // Scholarship list
         Expanded(
           child:
-              _filteredScholarships.isEmpty
+              visibleScholarships.isEmpty
                   ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -287,21 +239,48 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                       ],
                     ),
                   )
-                  : ListView.builder(
+                  : ListView(
                     padding: const EdgeInsets.all(16),
-                    itemCount: _filteredScholarships.length,
-                    itemBuilder: (context, index) {
-                      final scholarship = _filteredScholarships[index];
-                      return _buildScholarshipCard(scholarship);
-                    },
+                    children: [
+                      ...visibleScholarships.map(
+                        (scholarship) => _buildScholarshipCard(scholarship),
+                      ),
+
+                      // Load More button
+                      if (_showLoadMore)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  // Show all scholarships
+                                  _visibleItemCount =
+                                      filteredScholarships.length;
+                                  _showLoadMore = false;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                              ),
+                              child: const Text('Load More Scholarships'),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
         ),
       ],
     );
   }
 
-  Widget _buildApplicationsTab() {
-    return _myApplications.isEmpty
+  Widget _buildApplicationsTab(ScholarshipProvider provider) {
+    final myApplications = provider.appliedScholarships;
+
+    return myApplications.isEmpty
         ? Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -325,9 +304,9 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
         )
         : ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: _myApplications.length,
+          itemCount: myApplications.length,
           itemBuilder: (context, index) {
-            final application = _myApplications[index];
+            final application = myApplications[index];
             return Card(
               margin: const EdgeInsets.only(bottom: 16),
               child: Padding(
@@ -340,22 +319,22 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                       children: [
                         Expanded(
                           child: Text(
-                            application['title'] as String,
+                            application.title,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
-                        _buildStatusChip(application['status'] as String),
+                        _buildStatusChip(application.status),
                       ],
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Category: ${application['category']}',
+                      'Category: ${application.category}',
                       style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Amount: ${application['amount']}',
+                      'Amount: ${application.amount}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
@@ -363,14 +342,14 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Deadline: ${_formatDate(application['deadline'] as String)}',
+                      'Deadline: ${_formatDate(application.deadline)}',
                       style: TextStyle(
                         color:
-                            _isDeadlineNear(application['deadline'] as String)
+                            _isDeadlineNear(application.deadline)
                                 ? Colors.red
                                 : Colors.grey[600],
                         fontWeight:
-                            _isDeadlineNear(application['deadline'] as String)
+                            _isDeadlineNear(application.deadline)
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                       ),
@@ -380,7 +359,7 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                     const SizedBox(height: 8),
 
                     // Application progress tracker
-                    if (application['status'] as String == 'Under Review')
+                    if (application.status == 'Under Review')
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -432,8 +411,7 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                               MaterialPageRoute(
                                 builder:
                                     (context) => ScholarshipDetailScreen(
-                                      scholarshipId:
-                                          application['id'] as String,
+                                      scholarshipId: application.id,
                                       isApplied: true,
                                     ),
                               ),
@@ -452,9 +430,9 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
         );
   }
 
-  Widget _buildScholarshipCard(Map<String, dynamic> scholarship) {
-    final bool isApplied = scholarship['isApplied'] as bool;
-    final int matchPercentage = scholarship['matchPercentage'] as int;
+  Widget _buildScholarshipCard(ScholarshipModel scholarship) {
+    final bool isApplied = scholarship.isApplied;
+    final int matchPercentage = scholarship.matchPercentage;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -465,7 +443,7 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
             MaterialPageRoute(
               builder:
                   (context) => ScholarshipDetailScreen(
-                    scholarshipId: scholarship['id'] as String,
+                    scholarshipId: scholarship.id,
                     isApplied: isApplied,
                   ),
             ),
@@ -485,13 +463,13 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          scholarship['title'] as String,
+                          scholarship.title,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Category: ${scholarship['category']}',
+                          'Category: ${scholarship.category}',
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,
@@ -534,7 +512,7 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
               ),
               const SizedBox(height: 8),
               Text(
-                scholarship['description'] as String,
+                scholarship.description,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -544,21 +522,21 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Amount: ${scholarship['amount']}',
+                    'Amount: ${scholarship.amount}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   Text(
-                    'Deadline: ${_formatDate(scholarship['deadline'] as String)}',
+                    'Deadline: ${_formatDate(scholarship.deadline)}',
                     style: TextStyle(
                       color:
-                          _isDeadlineNear(scholarship['deadline'] as String)
+                          _isDeadlineNear(scholarship.deadline)
                               ? Colors.red
                               : Colors.grey[600],
                       fontWeight:
-                          _isDeadlineNear(scholarship['deadline'] as String)
+                          _isDeadlineNear(scholarship.deadline)
                               ? FontWeight.bold
                               : FontWeight.normal,
                       fontSize: 12,
@@ -574,7 +552,7 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                   Expanded(
                     flex: 7,
                     child: Text(
-                      'Eligibility: ${scholarship['eligibility']}',
+                      'Eligibility: ${scholarship.eligibility}',
                       style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -582,7 +560,7 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                   ),
                   SizedBox(width: 4),
                   if (isApplied)
-                    _buildStatusChip(scholarship['status'] as String)
+                    _buildStatusChip(scholarship.status)
                   else
                     Expanded(
                       flex: 3,
@@ -593,7 +571,7 @@ class _ScholarshipHomeState extends State<ScholarshipHome>
                             MaterialPageRoute(
                               builder:
                                   (context) => ScholarshipDetailScreen(
-                                    scholarshipId: scholarship['id'] as String,
+                                    scholarshipId: scholarship.id,
                                     isApplied: false,
                                   ),
                             ),
