@@ -9,11 +9,57 @@ Campus Aid is a comprehensive student platform designed to streamline essential 
 ## Features
 
 ### 1. AI-Powered Canteen & Mess Management
-- View daily/weekly menu with real-time updates
-- Toggle dietary preferences (Veg/Non-Veg)
-- Pre-book meals with date and time selection
-- View nutrition information for dishes
-- Submit feedback using emoji/slider-based rating system
+
+The Campus Aid app features an AI-powered Canteen & Mess Management system that uses the Google Gemini API to provide personalized recommendations, nutrition analysis, and feedback for campus dining options.
+
+#### Setup
+
+1. **Get a Gemini API Key**
+   - Go to https://ai.google.dev/ and sign up for a Gemini API key
+   - Copy your API key
+
+2. **Configure the Environment**
+   - Open the `.env` file in the root directory
+   - Replace `your_gemini_api_key_here` with your actual Gemini API key:
+     ```
+     GEMINI_API_KEY=your_actual_api_key_here
+     ```
+
+3. **Install Dependencies**
+   - Run `flutter pub get` to install all required dependencies
+
+#### Features
+
+1. **AI-Powered Menu Recommendations**
+   - Get personalized meal suggestions based on dietary preferences
+   - Recommendations consider past meals and nutrition goals
+   - Click "Generate Recommendations" in the menu screen to see AI-suggested meals
+
+2. **Real-time Nutrition Analysis**
+   - Select any meal and click "Nutrition" to see AI-generated nutrition information
+   - Get detailed breakdown of estimated calories, macronutrients, and health benefits
+   - All nutritional analysis is powered by Gemini AI for personalized insights
+
+3. **Smart Feedback System**
+   - Rate your meals and receive personalized responses
+   - The AI analyzes your feedback to provide tailored responses
+   - Helps campus staff understand and improve meal offerings
+
+#### Usage
+
+1. Navigate to the Canteen tab in the app
+2. Toggle between vegetarian and non-vegetarian options as needed
+3. Expand the AI Recommendations panel to see suggested meals
+4. Click on any meal to view details and select "Nutrition" to see AI-generated analysis
+5. Use the Feedback tab to rate meals and receive AI-generated responses
+
+#### Technical Implementation
+
+The AI features are implemented using:
+- Google's Gemini API (via `google_generative_ai` package)
+- Secure API key storage using `flutter_dotenv`
+- Provider pattern for state management
+- Asynchronous API calls for seamless user experience
 
 ### 2. Digital Lost & Found System
 - Report lost items with details and verification questions

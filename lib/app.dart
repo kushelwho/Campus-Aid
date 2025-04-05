@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/dashboard/screens/home_dashboard.dart';
@@ -7,34 +8,43 @@ import 'features/lost_found/screens/lost_found_home.dart';
 import 'features/scholarship/screens/scholarship_home.dart';
 import 'features/settings/screens/settings_screen.dart';
 import 'features/profile/screens/user_profile_screen.dart';
+import 'features/canteen/providers/canteen_provider.dart';
+import 'features/canteen/services/gemini_service.dart';
 
 class CampusAidApp extends StatelessWidget {
   const CampusAidApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Campus Aid',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF3066BE),
-          brightness: Brightness.light,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => CanteenProvider(GeminiService()),
         ),
-        useMaterial3: true,
-        fontFamily: 'Poppins',
+      ],
+      child: MaterialApp(
+        title: 'Campus Aid',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF3066BE),
+            brightness: Brightness.light,
+          ),
+          useMaterial3: true,
+          fontFamily: 'Poppins',
+        ),
+        initialRoute: '/login',
+        routes: {
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/dashboard': (context) => const HomeDashboard(),
+          '/canteen': (context) => const CanteenHome(),
+          '/lost-found': (context) => const LostFoundHome(),
+          '/scholarship': (context) => const ScholarshipHome(),
+          '/settings': (context) => const SettingsScreen(),
+          '/profile': (context) => const UserProfileScreen(),
+        },
       ),
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/dashboard': (context) => const HomeDashboard(),
-        '/canteen': (context) => const CanteenHome(),
-        '/lost-found': (context) => const LostFoundHome(),
-        '/scholarship': (context) => const ScholarshipHome(),
-        '/settings': (context) => const SettingsScreen(),
-        '/profile': (context) => const UserProfileScreen(),
-      },
     );
   }
 }
