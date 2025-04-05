@@ -21,9 +21,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      // In a real app, you would implement actual authentication here
-      // For now, we'll just navigate to the dashboard
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      // Check for hardcoded credentials
+      final email = _emailController.text;
+      final password = _passwordController.text;
+
+      if (email == "test@test.com" && password == "1234567890") {
+        // Valid credentials, navigate to dashboard
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        // Invalid credentials, show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Invalid email or password. Only test@test.com with password 1234567890 is allowed.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -61,6 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _emailController,
                       decoration: const InputDecoration(
                         labelText: 'Email',
+                        hintText: 'test@test.com',
                         prefixIcon: Icon(Icons.email_outlined),
                         border: OutlineInputBorder(),
                       ),
@@ -89,9 +105,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
                         }
                         return null;
                       },
