@@ -40,13 +40,15 @@ class _HomeDashboardState extends State<HomeDashboard> {
         title: const Text('Campus Aid'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: _showNotifications,
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              // Show notifications
+            },
           ),
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.settings_outlined),
             onPressed: () {
-              // Navigate to settings
+              Navigator.pushNamed(context, '/settings');
             },
           ),
         ],
@@ -123,7 +125,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                     icon: Icons.person,
                     color: Colors.purple,
                     onTap: () {
-                      // Navigate to profile
+                      Navigator.pushNamed(context, '/profile');
                     },
                   ),
                 ],

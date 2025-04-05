@@ -5,6 +5,8 @@ import 'features/dashboard/screens/home_dashboard.dart';
 import 'features/canteen/screens/canteen_home.dart';
 import 'features/lost_found/screens/lost_found_home.dart';
 import 'features/scholarship/screens/scholarship_home.dart';
+import 'features/settings/screens/settings_screen.dart';
+import 'features/profile/screens/user_profile_screen.dart';
 
 class CampusAidApp extends StatelessWidget {
   const CampusAidApp({super.key});
@@ -30,6 +32,8 @@ class CampusAidApp extends StatelessWidget {
         '/canteen': (context) => const CanteenHome(),
         '/lost-found': (context) => const LostFoundHome(),
         '/scholarship': (context) => const ScholarshipHome(),
+        '/settings': (context) => const SettingsScreen(),
+        '/profile': (context) => const UserProfileScreen(),
       },
     );
   }
