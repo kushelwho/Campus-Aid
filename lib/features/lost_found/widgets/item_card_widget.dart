@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../providers/lost_found_provider.dart';
 
 class ItemCardWidget extends StatelessWidget {
@@ -106,12 +107,88 @@ class ItemCardWidget extends StatelessWidget {
                       ),
                     ],
                   ),
+
+                  const SizedBox(height: 16),
+
+                  // "Found" or "Owner Found" button
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _confirmItemResolution(context),
+                      icon: Icon(
+                        isLostItem ? Icons.check_circle : Icons.person_search,
+                        color: isLostItem ? Colors.green : Colors.blue,
+                      ),
+                      label: Text(isLostItem ? 'Found' : 'Owner Found'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isLostItem ? Colors.green[50] : Colors.blue[50],
+                        foregroundColor:
+                            isLostItem ? Colors.green[800] : Colors.blue[800],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _confirmItemResolution(BuildContext context) {
+    final bool isLostItem = item.status == 'lost';
+    final String title =
+        isLostItem ? 'Mark Item as Found?' : 'Mark as Owner Found?';
+    final String content =
+        isLostItem
+            ? 'Has this item been found? It will be removed from the lost items list.'
+            : 'Has the owner claimed this item? It will be removed from the found items list.';
+    final String buttonText = isLostItem ? 'Mark as Found' : 'Mark as Claimed';
+    final String reason = isLostItem ? 'Item was found' : 'Owner claimed item';
+
+    showDialog(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  // Get the provider and remove the item
+                  final provider = Provider.of<LostFoundProvider>(
+                    context,
+                    listen: false,
+                  );
+                  provider.removeItem(item.id, reason).then((_) {
+                    // Close the dialog
+                    Navigator.of(ctx).pop();
+
+                    // Show success message
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          isLostItem
+                              ? 'Item marked as found and removed from the list'
+                              : 'Item marked as claimed and removed from the list',
+                        ),
+                        backgroundColor:
+                            isLostItem ? Colors.green : Colors.blue,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  });
+                },
+                child: Text(buttonText),
+              ),
+            ],
+          ),
     );
   }
 }

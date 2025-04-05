@@ -228,4 +228,24 @@ class LostFoundProvider with ChangeNotifier {
 
     return isCorrect;
   }
+
+  // Remove an item from the list when it's found or owner is found
+  Future<void> removeItem(String itemId, String reason) async {
+    print('REMOVING ITEM: $itemId, Reason: $reason');
+    print(
+      'BEFORE REMOVAL - Total items: ${_items.length}, Lost: ${lostItems.length}, Found: ${foundItems.length}',
+    );
+
+    _items = _items.where((item) => item.id != itemId).toList();
+
+    // Save to persistent storage
+    await _saveItems();
+
+    print(
+      'AFTER REMOVAL - Total items: ${_items.length}, Lost: ${lostItems.length}, Found: ${foundItems.length}',
+    );
+
+    // Notify listeners to rebuild the UI
+    notifyListeners();
+  }
 }

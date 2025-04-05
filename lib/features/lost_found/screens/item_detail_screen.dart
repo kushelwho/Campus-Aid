@@ -104,6 +104,63 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     });
   }
 
+  // Show confirmation dialog for marking an item as found or owner found
+  void _confirmItemResolution(BuildContext context, LostFoundItem item) {
+    final bool isLostItem = item.status == 'lost';
+    final String title =
+        isLostItem ? 'Mark Item as Found?' : 'Mark as Owner Found?';
+    final String content =
+        isLostItem
+            ? 'Has this item been found? It will be removed from the lost items list.'
+            : 'Has the owner claimed this item? It will be removed from the found items list.';
+    final String buttonText = isLostItem ? 'Mark as Found' : 'Mark as Claimed';
+    final String reason = isLostItem ? 'Item was found' : 'Owner claimed item';
+
+    showDialog(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  // Get the provider and remove the item
+                  final provider = Provider.of<LostFoundProvider>(
+                    context,
+                    listen: false,
+                  );
+                  provider.removeItem(item.id, reason).then((_) {
+                    // Close the dialog
+                    Navigator.of(ctx).pop();
+
+                    // Show success message
+                    _showMessage(
+                      isLostItem
+                          ? 'Item marked as found and removed from the list'
+                          : 'Item marked as claimed and removed from the list',
+                      isLostItem ? Colors.green : Colors.blue,
+                    );
+
+                    // Navigate back to the list screen
+                    Future.delayed(const Duration(seconds: 1), () {
+                      if (mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    });
+                  });
+                },
+                child: Text(buttonText),
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<LostFoundProvider>(context);
@@ -119,6 +176,20 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           title: Text(isLostItem ? 'Lost Item' : 'Found Item'),
           backgroundColor: statusColor.withOpacity(0.8),
           foregroundColor: Colors.white,
+          actions: [
+            // Add Mark as Found/Owner Found button in the app bar
+            TextButton.icon(
+              onPressed: () => _confirmItemResolution(context, item),
+              icon: Icon(
+                isLostItem ? Icons.check_circle : Icons.person_search,
+                color: Colors.white,
+              ),
+              label: Text(
+                isLostItem ? 'Mark as Found' : 'Owner Found',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -377,6 +448,21 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                 ),
               ],
             ],
+          ),
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton.icon(
+              onPressed: () => _confirmItemResolution(context, item),
+              icon: Icon(isLostItem ? Icons.check_circle : Icons.person_search),
+              label: Text(isLostItem ? 'Mark as Found' : 'Mark as Owner Found'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isLostItem ? Colors.green : Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
           ),
         ),
       ),
