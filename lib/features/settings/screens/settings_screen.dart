@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../core/providers/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -8,9 +10,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // Theme settings
-  bool _isDarkMode = false;
-
   // Notification settings
   bool _notifyScholarships = true;
   bool _notifyCanteen = true;
@@ -27,11 +26,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     'Marathi',
   ];
 
-  // Font size
-  double _fontSize = 1.0; // 1.0 is the default
-
   @override
   Widget build(BuildContext context) {
+    // Access the theme provider
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
@@ -50,15 +49,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SwitchListTile(
                 title: const Text('Dark Mode'),
                 subtitle: const Text('Use darker colors for night viewing'),
-                value: _isDarkMode,
+                value: themeProvider.isDarkMode,
                 onChanged: (value) {
-                  setState(() {
-                    _isDarkMode = value;
-                  });
-                  // In a real app, this would update the app's theme
+                  // Toggle theme mode using the provider
+                  themeProvider.toggleThemeMode();
                 },
                 secondary: Icon(
-                  _isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                  themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
                 ),
               ),
 
@@ -71,16 +68,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: SizedBox(
                   width: 150,
                   child: Slider(
-                    value: _fontSize,
+                    value: themeProvider.fontSize,
                     min: 0.8,
                     max: 1.2,
                     divisions: 4,
-                    label: _getFontSizeLabel(),
+                    label: themeProvider.getFontSizeLabel(),
                     onChanged: (value) {
-                      setState(() {
-                        _fontSize = value;
-                      });
-                      // In a real app, this would adjust text scaling
+                      // Update font size using the provider
+                      themeProvider.setFontSize(value);
                     },
                   ),
                 ),
@@ -170,6 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
                   // Navigate to profile screen
+                  Navigator.pushNamed(context, '/profile');
                 },
               ),
 
@@ -333,20 +329,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  String _getFontSizeLabel() {
-    if (_fontSize <= 0.8) {
-      return 'Small';
-    } else if (_fontSize <= 0.9) {
-      return 'Medium Small';
-    } else if (_fontSize <= 1.0) {
-      return 'Medium';
-    } else if (_fontSize <= 1.1) {
-      return 'Medium Large';
-    } else {
-      return 'Large';
-    }
-  }
-
   void _showLanguageSelector() {
     showDialog(
       context: context,
@@ -406,7 +388,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Navigator.pop(context);
                 // In a real app, this would implement actual logout
                 // and navigation to login screen
-                Navigator.pop(context); // Go back to previous screen
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
               },
               child: const Text('Logout'),
             ),

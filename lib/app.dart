@@ -12,49 +12,74 @@ import 'features/canteen/providers/canteen_provider.dart';
 import 'features/canteen/services/gemini_service.dart';
 import 'features/lost_found/providers/lost_found_provider.dart';
 import 'features/scholarship/providers/scholarship_provider.dart';
+import 'core/providers/theme_provider.dart';
 
 class CampusAidApp extends StatelessWidget {
   const CampusAidApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Create a single instance of the LostFoundProvider to ensure we're using the same one everywhere
+    // Create instances of providers
     final lostFoundProvider = LostFoundProvider();
-    // Create an instance of ScholarshipProvider
     final scholarshipProvider = ScholarshipProvider();
+    final themeProvider = ThemeProvider();
 
     print('App initialized - creating providers');
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CanteenProvider(GeminiService())),
-        // Use the instance we created to ensure consistency
         ChangeNotifierProvider.value(value: lostFoundProvider),
-        // Add ScholarshipProvider
         ChangeNotifierProvider.value(value: scholarshipProvider),
+        ChangeNotifierProvider.value(value: themeProvider),
       ],
       child: Builder(
         builder: (context) {
-          // Verify provider is accessible in the root
+          // Access providers
           final provider = Provider.of<LostFoundProvider>(
             context,
             listen: false,
           );
+          final theme = Provider.of<ThemeProvider>(context);
+
           print(
             'LostFoundProvider initialized with ${provider.items.length} items',
+          );
+
+          // Define light and dark themes
+          final lightTheme = ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF3066BE),
+              brightness: Brightness.light,
+            ),
+            useMaterial3: true,
+            fontFamily: 'Poppins',
+          );
+
+          final darkTheme = ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF3066BE),
+              brightness: Brightness.dark,
+            ),
+            useMaterial3: true,
+            fontFamily: 'Poppins',
+          );
+
+          // Apply font size adjustments to both themes
+          final adjustedLightTheme = lightTheme.copyWith(
+            textTheme: theme.getAdjustedTextTheme(lightTheme.textTheme),
+          );
+
+          final adjustedDarkTheme = darkTheme.copyWith(
+            textTheme: theme.getAdjustedTextTheme(darkTheme.textTheme),
           );
 
           return MaterialApp(
             title: 'Campus Aid',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color(0xFF3066BE),
-                brightness: Brightness.light,
-              ),
-              useMaterial3: true,
-              fontFamily: 'Poppins',
-            ),
+            theme: adjustedLightTheme,
+            darkTheme: adjustedDarkTheme,
+            themeMode: theme.themeMode,
             initialRoute: '/login',
             routes: {
               '/login': (context) => const LoginScreen(),
