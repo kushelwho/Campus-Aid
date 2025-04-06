@@ -16,7 +16,9 @@ import 'features/events/providers/events_provider.dart';
 import 'features/events/screens/events_calendar_screen.dart';
 import 'features/faculty_rating/providers/faculty_rating_provider.dart';
 import 'features/faculty_rating/screens/faculty_list_screen.dart';
+import 'features/auth/providers/auth_provider.dart';
 import 'core/providers/theme_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class CampusAidApp extends StatelessWidget {
   const CampusAidApp({super.key});
@@ -29,6 +31,7 @@ class CampusAidApp extends StatelessWidget {
     final themeProvider = ThemeProvider();
     final eventsProvider = EventsProvider();
     final facultyRatingProvider = FacultyRatingProvider();
+    final authProvider = AuthProvider();
 
     print('App initialized - creating providers');
 
@@ -40,6 +43,7 @@ class CampusAidApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: eventsProvider),
         ChangeNotifierProvider.value(value: facultyRatingProvider),
+        ChangeNotifierProvider.value(value: authProvider),
       ],
       child: Builder(
         builder: (context) {
@@ -49,6 +53,7 @@ class CampusAidApp extends StatelessWidget {
             listen: false,
           );
           final theme = Provider.of<ThemeProvider>(context);
+          final auth = Provider.of<AuthProvider>(context);
 
           print(
             'LostFoundProvider initialized with ${provider.items.length} items',

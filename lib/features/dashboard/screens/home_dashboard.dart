@@ -4,6 +4,7 @@ import '../../../features/scholarship/providers/scholarship_provider.dart';
 import '../../../features/scholarship/screens/scholarship_detail_screen.dart';
 import '../../../features/events/screens/events_calendar_screen.dart';
 import '../../../features/faculty_rating/screens/faculty_list_screen.dart';
+import '../../../features/auth/providers/auth_provider.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -107,11 +108,20 @@ class _HomeDashboardState extends State<HomeDashboard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // User greeting
-              Text(
-                'Hello, Student!',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, _) {
+                  // Get email and extract name (part before @)
+                  final email = authProvider.userEmail;
+                  final name =
+                      email != null ? email.split('@').first : 'Student';
+
+                  return Text(
+                    'Hello, ${name.isNotEmpty ? name : 'Student'}!',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 4),
               Text(
