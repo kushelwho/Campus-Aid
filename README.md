@@ -1,10 +1,12 @@
 # Campus Aid
 
-Campus Aid is a comprehensive student platform designed to streamline essential campus services through technology and automation. The app integrates three core modules to enhance the student experience:
+Campus Aid is a comprehensive student platform designed to streamline essential campus services through technology and automation. The app integrates five core modules to enhance the student experience:
 
 - **AI-Powered Canteen & Mess Management**
 - **Digital Lost & Found System**
 - **Automated Scholarship Finder**
+- **Campus Events Calendar**
+- **Faculty Rating System**
 
 ## Features
 
@@ -92,6 +94,53 @@ The Scholarship Finder helps students discover, filter, and apply for relevant s
    - Deadline reminders and notifications
    - Document management for submission requirements
 
+### 4. Campus Events Calendar
+
+The Events Calendar provides a comprehensive view of all campus events and allows students to register for events organized by various campus societies and departments.
+
+#### Features
+
+1. **Event Discovery**
+   - Monthly calendar view showing all campus events
+   - Search and filter events by category, date, or organizer
+   - Detailed event descriptions with location and timing information
+
+2. **Event Registration**
+   - One-click registration for society & fest events
+   - Capacity tracking to show event availability
+
+3. **Personalized Event Feed**
+   - View upcoming events for the next 7 days
+   - Track events you've registered for
+   - Receive notifications about new events and changes
+
+### 5. Faculty Rating System
+
+The Faculty Rating System allows students to view, rate, and review faculty members, helping them make informed decisions when selecting courses.
+
+#### Features
+
+1. **Faculty Discovery**
+   - Browse through all faculty members with search and filter options
+   - Filter by department, rating, and other criteria
+   - Sort by highest/lowest ratings or alphabetically
+
+2. **Detailed Faculty Profiles**
+   - View comprehensive faculty information including department, designation, and specializations
+   - See average ratings across multiple categories (teaching quality, grading fairness, engagement)
+   - Read faculty bios and contact information
+
+3. **Rating & Review System**
+   - Rate faculty members across multiple categories
+   - Write detailed reviews of your experiences
+   - Option to post anonymously for honest feedback
+   - Mark helpful reviews and report inappropriate content
+
+4. **Review Credibility**
+   - Verified review system for authentic feedback
+   - Helpful votes to highlight the most valuable reviews
+   - Course and semester information to provide context
+
 ## Additional Features
 
 ### Authentication System
@@ -151,6 +200,8 @@ lib/
 │   ├── auth/         # Authentication feature
 │   ├── canteen/      # AI-powered canteen management 
 │   ├── dashboard/    # Home dashboard
+│   ├── events/       # Campus events calendar
+│   ├── faculty_rating/ # Faculty rating system
 │   ├── lost_found/   # Lost and found system
 │   ├── scholarship/  # Scholarship finder
 │   ├── profile/      # User profile management
@@ -166,6 +217,7 @@ lib/
 - **Google Gemini API**: AI capabilities for canteen features
 - **Material 3**: Design system
 - **Flutter Dotenv**: Environment configuration
+- **UUID**: Unique ID generation for reviews and other entities
 
 ## Future Enhancements
 - Push notifications for real-time alerts
@@ -173,6 +225,7 @@ lib/
 - Enhanced AI features across all modules
 - Offline support for core functionality
 - Analytics dashboard for usage patterns
+- Verification system for faculty accounts to respond to reviews
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
