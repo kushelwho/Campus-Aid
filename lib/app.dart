@@ -12,6 +12,7 @@ import 'features/canteen/providers/canteen_provider.dart';
 import 'features/canteen/services/gemini_service.dart';
 import 'features/lost_found/providers/lost_found_provider.dart';
 import 'features/scholarship/providers/scholarship_provider.dart';
+import 'features/events/providers/events_provider.dart';
 import 'core/providers/theme_provider.dart';
 
 class CampusAidApp extends StatelessWidget {
@@ -23,6 +24,7 @@ class CampusAidApp extends StatelessWidget {
     final lostFoundProvider = LostFoundProvider();
     final scholarshipProvider = ScholarshipProvider();
     final themeProvider = ThemeProvider();
+    final eventsProvider = EventsProvider();
 
     print('App initialized - creating providers');
 
@@ -32,6 +34,7 @@ class CampusAidApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: lostFoundProvider),
         ChangeNotifierProvider.value(value: scholarshipProvider),
         ChangeNotifierProvider.value(value: themeProvider),
+        ChangeNotifierProvider.value(value: eventsProvider),
       ],
       child: Builder(
         builder: (context) {

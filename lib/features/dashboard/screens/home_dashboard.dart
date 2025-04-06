@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../features/scholarship/providers/scholarship_provider.dart';
 import '../../../features/scholarship/screens/scholarship_detail_screen.dart';
+import '../../../features/events/screens/events_calendar_screen.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -32,6 +33,13 @@ class _HomeDashboardState extends State<HomeDashboard> {
       'description': 'Someone found a wallet that matches your lost item.',
       'time': 'Yesterday',
       'icon': Icons.search,
+      'read': true,
+    },
+    {
+      'title': 'New Campus Event',
+      'description': 'Annual Tech Fest is coming up next week.',
+      'time': '3 days ago',
+      'icon': Icons.event,
       'read': true,
     },
   ];
@@ -151,12 +159,18 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   ),
                   _buildFeatureTile(
                     context,
-                    title: 'Profile',
-                    description: 'Manage your information',
-                    icon: Icons.person,
+                    title: 'Events Calendar',
+                    description: 'Campus events & registration',
+                    icon: Icons.event,
                     color: Colors.purple,
                     onTap: () {
-                      Navigator.pushNamed(context, '/profile');
+                      // Navigate to the events calendar screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EventsCalendarScreen(),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -200,6 +214,23 @@ class _HomeDashboardState extends State<HomeDashboard> {
                     // If no scholarships with near deadlines, just navigate to scholarship home
                     Navigator.pushNamed(context, '/scholarship');
                   }
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildRecommendationCard(
+                context,
+                title: 'Upcoming Campus Events',
+                description: 'View and register for campus events',
+                icon: Icons.event,
+                color: Colors.purple,
+                onTap: () {
+                  // Navigate to the events calendar screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EventsCalendarScreen(),
+                    ),
+                  );
                 },
               ),
             ],
