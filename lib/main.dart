@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io' show Platform;
 import 'firebase_options.dart';
 import 'app.dart';
@@ -11,11 +12,36 @@ void main() async {
   // Load environment variables from .env file
   await dotenv.load();
 
-  // Initialize Firebase with options from firebase_options.dart
+  // Initialize Firebase with options
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+    // Different initialization for Android and iOS
+    if (Platform.isAndroid) {
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
+          apiKey: dotenv.env['FIREBASE_API_KEY'] ?? '',
+          appId: dotenv.env['FIREBASE_APP_ID'] ?? '',
+          messagingSenderId:
+              dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '991799011256',
+          projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? '',
+          storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'],
+        ),
+      );
+    } else {
+      // For iOS, provide different configuration if needed
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+
+    // Configure Firestore settings
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
+
+    // Allow writes even when offline (will sync when back online)
+    await FirebaseFirestore.instance.enablePersistence();
+
     print('Firebase initialized successfully');
   } catch (e) {
     print('Error initializing Firebase: $e');
