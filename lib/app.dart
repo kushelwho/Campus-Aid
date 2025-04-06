@@ -13,6 +13,9 @@ import 'features/canteen/services/gemini_service.dart';
 import 'features/lost_found/providers/lost_found_provider.dart';
 import 'features/scholarship/providers/scholarship_provider.dart';
 import 'features/events/providers/events_provider.dart';
+import 'features/events/screens/events_calendar_screen.dart';
+import 'features/faculty_rating/providers/faculty_rating_provider.dart';
+import 'features/faculty_rating/screens/faculty_list_screen.dart';
 import 'core/providers/theme_provider.dart';
 
 class CampusAidApp extends StatelessWidget {
@@ -25,6 +28,7 @@ class CampusAidApp extends StatelessWidget {
     final scholarshipProvider = ScholarshipProvider();
     final themeProvider = ThemeProvider();
     final eventsProvider = EventsProvider();
+    final facultyRatingProvider = FacultyRatingProvider();
 
     print('App initialized - creating providers');
 
@@ -35,6 +39,7 @@ class CampusAidApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: scholarshipProvider),
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: eventsProvider),
+        ChangeNotifierProvider.value(value: facultyRatingProvider),
       ],
       child: Builder(
         builder: (context) {
@@ -97,6 +102,8 @@ class CampusAidApp extends StatelessWidget {
               '/scholarship': (context) => const ScholarshipHome(),
               '/settings': (context) => const SettingsScreen(),
               '/profile': (context) => const UserProfileScreen(),
+              '/faculty-rating': (context) => const FacultyListScreen(),
+              '/events': (context) => const EventsCalendarScreen(),
             },
           );
         },

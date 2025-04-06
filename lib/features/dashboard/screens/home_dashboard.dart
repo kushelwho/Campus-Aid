@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../features/scholarship/providers/scholarship_provider.dart';
 import '../../../features/scholarship/screens/scholarship_detail_screen.dart';
 import '../../../features/events/screens/events_calendar_screen.dart';
+import '../../../features/faculty_rating/screens/faculty_list_screen.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -41,6 +42,13 @@ class _HomeDashboardState extends State<HomeDashboard> {
       'time': '3 days ago',
       'icon': Icons.event,
       'read': true,
+    },
+    {
+      'title': 'New Faculty Ratings',
+      'description': 'Students have added new ratings for your professors.',
+      'time': '1 day ago',
+      'icon': Icons.star,
+      'read': false,
     },
   ];
 
@@ -165,15 +173,29 @@ class _HomeDashboardState extends State<HomeDashboard> {
                     color: Colors.purple,
                     onTap: () {
                       // Navigate to the events calendar screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EventsCalendarScreen(),
-                        ),
-                      );
+                      Navigator.pushNamed(context, '/events');
                     },
                   ),
                 ],
+              ),
+              const SizedBox(height: 24),
+
+              // Faculty Rating Tile (Centered)
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: _buildFeatureTile(
+                    context,
+                    title: 'Faculty Ratings',
+                    description: 'Rate & review professors',
+                    icon: Icons.star,
+                    color: Colors.amber,
+                    onTap: () {
+                      // Use the named route for navigation
+                      Navigator.pushNamed(context, '/faculty-rating');
+                    },
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
 
@@ -231,6 +253,19 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       builder: (context) => const EventsCalendarScreen(),
                     ),
                   );
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildRecommendationCard(
+                context,
+                title: 'Rate Your Professors',
+                description:
+                    'Help other students by rating your faculty members',
+                icon: Icons.star,
+                color: Colors.amber,
+                onTap: () {
+                  // Use the named route for navigation
+                  Navigator.pushNamed(context, '/faculty-rating');
                 },
               ),
             ],
