@@ -45,35 +45,74 @@ The Campus Aid app features an AI-powered Canteen & Mess Management system that 
    - The AI analyzes your feedback to provide tailored responses
    - Helps campus staff understand and improve meal offerings
 
-#### Usage
-
-1. Navigate to the Canteen tab in the app
-2. Toggle between vegetarian and non-vegetarian options as needed
-3. Expand the AI Recommendations panel to see suggested meals
-4. Click on any meal to view details and select "Nutrition" to see AI-generated analysis
-5. Use the Feedback tab to rate meals and receive AI-generated responses
-
-#### Technical Implementation
-
-The AI features are implemented using:
-- Google's Gemini API (via `google_generative_ai` package)
-- Secure API key storage using `flutter_dotenv`
-- Provider pattern for state management
-- Asynchronous API calls for seamless user experience
-
 ### 2. Digital Lost & Found System
-- Report lost items with details and verification questions
-- Report found items with location and images
-- Browse lost/found items with filters
-- View items on interactive campus map
-- Chat with finders/owners to arrange handovers
+
+The Lost & Found module provides a streamlined way for students to report, search for, and claim lost or found items on campus.
+
+#### Features
+
+1. **Item Reporting**
+   - Report lost items with detailed descriptions and verification questions
+   - Report found items with location information and photo uploads
+   - Timestamp-based tracking system for all reported items
+
+2. **Search and Discovery**
+   - Browse through lost and found items with category filters
+   - Search functionality to quickly find specific items
+   - View items on an interactive campus map
+
+3. **Claiming System**
+   - Built-in chat functionality to connect item finders with owners
+   - Verification questions to confirm rightful ownership
+   - Arrangement of secure handover location
+
+4. **Item Management**
+   - Status tracking for items (lost, found, claimed, returned)
+   - Notifications for potential matches
+   - Item history and analytics
 
 ### 3. Automated Scholarship Finder
-- Complete profile with academic and personal information
-- Discover personalized scholarships with match percentages
-- Filter and search for scholarships by category
-- Track application progress
-- Receive deadline reminders
+
+The Scholarship Finder helps students discover, filter, and apply for relevant scholarships based on their profile and eligibility.
+
+#### Features
+
+1. **Profile Management**
+   - Create and update academic and personal profiles
+   - Input eligibility criteria including grades, activities, and demographics
+   - Upload and store required documents
+
+2. **Scholarship Discovery**
+   - Personalized scholarship recommendations with match percentages
+   - Filter scholarships by category, amount, deadline, and eligibility
+   - Save favorite scholarships for later reference
+
+3. **Application Tracking**
+   - Track application progress from discovery to submission
+   - Deadline reminders and notifications
+   - Document management for submission requirements
+
+## Additional Features
+
+### Authentication System
+- Secure login with email/password
+- User registration with validation
+- Password reset functionality
+
+### User Profile Management
+- View and edit personal information
+- Academic profile management
+- Preference settings
+
+### Dashboard
+- Centralized access to all modules
+- Recent activity summary
+- Quick actions menu
+
+### Settings
+- Theme customization (light/dark mode)
+- Font size adjustment
+- Notification preferences
 
 ## Getting Started
 
@@ -90,7 +129,7 @@ git clone https://github.com/kushelwho/Campus-Aid.git
 
 2. Navigate to the project directory:
 ```
-cd campus_aid
+cd Campus-Aid
 ```
 
 3. Install dependencies:
@@ -107,53 +146,33 @@ flutter run
 ```
 lib/
 ├── config/           # App configuration
-├── core/             # Core utilities
+├── core/             # Core utilities and providers
 ├── features/         # Feature modules
 │   ├── auth/         # Authentication feature
-│   ├── canteen/      # Canteen management feature
+│   ├── canteen/      # AI-powered canteen management 
 │   ├── dashboard/    # Home dashboard
-│   ├── lost_found/   # Lost and found feature
-│   ├── scholarship/  # Scholarship feature
-├── shared/           # Shared components
-├── app.dart          # App entry point
+│   ├── lost_found/   # Lost and found system
+│   ├── scholarship/  # Scholarship finder
+│   ├── profile/      # User profile management
+│   ├── settings/     # App settings
+├── shared/           # Shared components and widgets
+├── app.dart          # App configuration and routes
 ├── main.dart         # Main entry point
 ```
 
-## Modules
-
-### Authentication
-- Login with email/password or OAuth
-- Registration with validation
-- Profile management
-
-### Dashboard
-- Home screen with quick access to all modules
-- Notification center
-- Personalized recommendations
-
-### Canteen Management
-- Menu display with filtering
-- Meal booking system
-- Feedback mechanism
-
-### Lost & Found
-- Item reporting forms
-- Browsing interface
-- Interactive map view
-- Messaging system for item claiming
-
-### Scholarship Finder
-- Profile setup for scholarship matching
-- Scholarship discovery feed
-- Application tracking
-- Document management
+## Tech Stack
+- **Flutter**: UI framework
+- **Provider**: State management
+- **Google Gemini API**: AI capabilities for canteen features
+- **Material 3**: Design system
+- **Flutter Dotenv**: Environment configuration
 
 ## Future Enhancements
+- Push notifications for real-time alerts
 - Integration with campus payment systems
-- AI-powered meal recommendations
-- Real-time notifications for lost item matches
-- Scholarship application analytics
-- Dark mode and additional themes
+- Enhanced AI features across all modules
+- Offline support for core functionality
+- Analytics dashboard for usage patterns
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
