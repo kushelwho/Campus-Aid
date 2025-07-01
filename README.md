@@ -191,6 +191,47 @@ flutter pub get
 flutter run
 ```
 
+### Firebase Configuration
+
+⚠️ **Important**: Before running the app, you must configure Firebase for both Android and iOS platforms.
+
+#### Android Configuration
+1. Go to the [Firebase Console](https://console.firebase.google.com/)
+2. Select your Campus-Aid project (or create a new one if it doesn't exist)
+3. Add an Android app to your project
+4. Download the `google-services.json` file
+5. Place the `google-services.json` file in the `android/app/` directory
+6. The file should already be present, but if missing, follow the steps above
+
+#### iOS Configuration
+1. In the same Firebase project, add an iOS app
+2. Download the `GoogleService-Info.plist` file
+3. **Add the file to your iOS project using one of these methods:**
+
+   **Method A: Using Xcode (Recommended)**
+   1. Open the project in Xcode: `open ios/Runner.xcworkspace`
+   2. Right-click on the "Runner" folder in the project navigator
+   3. Select "Add Files to Runner"
+   4. Navigate to and select your downloaded `GoogleService-Info.plist` file
+   5. Make sure "Copy items if needed" is checked
+   6. Make sure the "Runner" target is selected
+   7. Click "Add"
+
+   **Method B: Manual Copy**
+   1. Copy the `GoogleService-Info.plist` file to `ios/Runner/` directory
+   2. Open `ios/Runner.xcodeproj` in Xcode
+   3. Add the file reference to the project manually
+
+#### Common Error
+If you encounter the error:
+```
+Build input file cannot be found: '/path/to/GoogleService-Info.plist'
+```
+This means the `GoogleService-Info.plist` file is missing from your iOS Runner directory. Follow the iOS configuration steps above to resolve this issue.
+
+#### Environment Variables
+Don't forget to configure your `.env` file with the Gemini API key as mentioned in the AI-Powered Canteen section above.
+
 ## Project Structure
 ```
 lib/
